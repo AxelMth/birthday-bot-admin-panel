@@ -21,11 +21,13 @@ export function Layout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en"
-          className="dark"
-          style={{
-            colorScheme: 'dark',
-          }}>
+    <html
+      lang="en"
+      className="dark"
+      style={{
+        colorScheme: 'dark',
+      }}
+    >
       <head>
         <meta charSet="UTF-8" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
