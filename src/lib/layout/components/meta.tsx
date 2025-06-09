@@ -1,12 +1,12 @@
 import { Helmet } from 'react-helmet-async';
 
-const APP_NAME = 'vite-react-chakra-starter';
+const APP_NAME = 'Birthday Bot Admin';
 
 export const Meta = () => {
   return (
     <Helmet>
-      <title>Vite React Chakra Starter</title>
-      <meta name="description" content="Vite React Chakra Starter Template" />
+      <title>Birthday Bot Admin</title>
+      <meta name="description" content="Admin panel for Birthday Bot" />
 
       <meta name="application-name" content={APP_NAME} />
       <meta name="apple-mobile-web-app-capable" content="yes" />
