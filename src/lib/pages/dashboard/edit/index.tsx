@@ -17,8 +17,20 @@ interface Person {
   id: number;
   name: string;
   birthdate: Date;
-  communications: Array<{ application: string }>;
+  communications: Array<{
+    application: string;
+    metadata: Record<string, string> | null;
+  }>;
 }
+
+const applicationsMetadata = {
+  slack: {
+    channelId: {
+      label: 'Channel ID',
+      type: 'text',
+    },
+  },
+};
 
 export default function EditPersonComponent() {
   const params = useParams();
@@ -46,7 +58,11 @@ export default function EditPersonComponent() {
     peopleClient
       .updatePersonById({
         params: { id: personId },
-        body: person,
+        body: {
+          ...person,
+          application: person.communications[0].application,
+          metadata: person.communications[0].metadata ?? undefined,
+        },
       })
       .then((response) => {
         if (response.status !== 200) {
@@ -71,6 +87,41 @@ export default function EditPersonComponent() {
       </Container>
     );
   }
+
+
+  const renderCommunicationMetadata = (communication: {
+    application: string;
+    metadata: Record<string, string> | null;
+  }, selectedApplication: string) => {
+    if (!communication.metadata) {
+      return null;
+    }
+    const applicationMetadata = applicationsMetadata[selectedApplication as keyof typeof applicationsMetadata];
+    if (!applicationMetadata) {
+      return null;
+    }
+    return Object.entries(applicationMetadata).map(([key, value]) => {
+      return (
+        <Field.Root key={key}>
+          <Field.Label>{value.label}</Field.Label>
+          <Input
+            key={key}
+            value={communication?.metadata?.[key]}
+            onChange={(e) => {
+              setPerson({
+                ...person,
+                communications: person.communications.map((c) =>
+                  c.application === selectedApplication
+                    ? { ...c, metadata: { ...c.metadata, [key]: e.target.value } }
+                    : c,
+                ),
+              });
+            }}
+          />
+        </Field.Root>
+      );
+    });
+  };
 
   return (
     <Container fluid centerContent>
@@ -110,7 +161,12 @@ export default function EditPersonComponent() {
           <Field.Root>
             <Field.Label>Application</Field.Label>
             <NativeSelect.Root>
-              <NativeSelect.Field name="application">
+              <NativeSelect.Field name="application" value={person.communications[0].application} onChange={(e) => {
+                setPerson({
+                  ...person,
+                  communications: person.communications.map((c) => c.application === e.target.value ? { ...c, application: e.target.value } : c),
+                });
+              }}>
                 <For each={['slack']}>
                   {(item) => (
                     <option key={item} value={item}>
@@ -121,6 +177,17 @@ export default function EditPersonComponent() {
               </NativeSelect.Field>
               <NativeSelect.Indicator />
             </NativeSelect.Root>
+          </Field.Root>
+
+          <Field.Root>
+            <Fieldset.Content>
+              {person.communications.map((c) => (
+                <Field.Root key={c.application}>
+                  <Field.Label>{c.application}</Field.Label>
+                  {renderCommunicationMetadata(c, c.application)}
+                </Field.Root>
+              ))}
+            </Fieldset.Content>
           </Field.Root>
         </Fieldset.Content>
 
