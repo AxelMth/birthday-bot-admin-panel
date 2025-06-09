@@ -16,10 +16,8 @@
 		"build": {
 			"dependsOn": ["type:check"],
 			"outputs": ["build/client/**", "public/**"],
-			"env": [
-				"NODE_ENV=production",
-				"VITE_SERVER_URL=https://birthday-bot-backend.fly.dev"
-			]
+			"env": ["VITE_SERVER_URL"],
+			"inputs": [".env.production"]
 		}
 	}
 }
