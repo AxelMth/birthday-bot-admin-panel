@@ -24,8 +24,8 @@ importers:
         specifier: ^3.52.1
         version: 3.52.1(@types/node@22.15.18)(zod@3.24.4)
       birthday-bot-contracts:
-        specifier: ^0.1.8
-        version: 0.1.8(@types/node@22.15.18)
+        specifier: ^0.1.9
+        version: 0.1.9(@types/node@22.15.18)
       isbot:
         specifier: ^5.1.28
         version: 5.1.28
@@ -2050,8 +2050,8 @@ packages:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
 
-  birthday-bot-contracts@0.1.8:
-    resolution: {integrity: sha512-Vmq61sHin3/q3X0UB0pIgIO3zLTlF4dVvJkDuRuLGdDvK/oPtesnOV5eVahxSV8z3tjXol/7/gIcvHqbIpWSHA==}
+  birthday-bot-contracts@0.1.9:
+    resolution: {integrity: sha512-+urqT+hhZhsfPkXpiZM+ajp6AAAkqscptTVX2aiBxnW6z8WDMjaOtgs2/xGPaObLH5PHwXIq3FCGdQudCMgWjA==}
 
   brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
@@ -7342,7 +7342,7 @@ snapshots:
 
   binary-extensions@2.3.0: {}
 
-  birthday-bot-contracts@0.1.8(@types/node@22.15.18):
+  birthday-bot-contracts@0.1.9(@types/node@22.15.18):
     dependencies:
       '@ts-rest/core': 3.52.1(@types/node@22.15.18)(zod@3.24.4)
       zod: 3.24.4
