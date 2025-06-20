@@ -13,20 +13,25 @@ import { useNavigate, useParams } from 'react-router';
 
 import { peopleClient } from '../../../client';
 
+type Application = "slack";
 interface Person {
   id: number;
   name: string;
   birthdate: Date;
   communications: Array<{
-    application: string;
+    application: Application;
     metadata: Record<string, string> | null;
   }>;
 }
 
-const applicationsMetadata = {
+const applicationsMetadata: Record<Application, Record<string, { label: string; type: string }>> = {
   slack: {
     channelId: {
       label: 'Channel ID',
+      type: 'text',
+    },
+    userId: {
+      label: 'User ID',
       type: 'text',
     },
   },
@@ -37,6 +42,8 @@ export default function EditPersonComponent() {
   const personId = +(params?.id ?? '0');
 
   const [person, setPerson] = useState<Person | null>(null);
+  const [currentApplication, setCurrentApplication] = useState<Application | null>(null);
+  const [currentMetadata, setCurrentMetadata] = useState<Record<string, unknown> | null>(null);
   useEffect(() => {
     if (!personId || !+personId) {
       return;
@@ -50,6 +57,8 @@ export default function EditPersonComponent() {
           return;
         }
         setPerson(response.body as unknown as Person);
+        setCurrentApplication(response.body.communications?.[0]?.application as Application ?? null);
+        setCurrentMetadata(response.body.communications?.[0]?.metadata ?? null);
       });
   }, [personId]);
 
@@ -59,9 +68,10 @@ export default function EditPersonComponent() {
       .updatePersonById({
         params: { id: personId },
         body: {
-          ...person,
-          application: person.communications[0].application,
-          metadata: person.communications[0].metadata ?? undefined,
+          name: person.name,
+          birthdate: person.birthdate,
+          application: currentApplication as Application,
+          metadata: currentMetadata as Record<string, string>,
         },
       })
       .then((response) => {
@@ -89,32 +99,19 @@ export default function EditPersonComponent() {
   }
 
 
-  const renderCommunicationMetadata = (communication: {
-    application: string;
-    metadata: Record<string, string> | null;
-  }, selectedApplication: string) => {
-    if (!communication.metadata) {
-      return null;
-    }
-    const applicationMetadata = applicationsMetadata[selectedApplication as keyof typeof applicationsMetadata];
-    if (!applicationMetadata) {
-      return null;
-    }
-    return Object.entries(applicationMetadata).map(([key, value]) => {
+  const renderCommunicationMetadata = (selectedApplication: Application, metadata: Record<string, unknown> | null) => {
+    return Object.entries(applicationsMetadata[selectedApplication]).map(([key, value]) => {
       return (
         <Field.Root key={key}>
           <Field.Label>{value.label}</Field.Label>
           <Input
             key={key}
-            value={communication?.metadata?.[key]}
+            // FIXME: Metadata[key] is a litteral
+            value={metadata?.[key] as string}
             onChange={(e) => {
-              setPerson({
-                ...person,
-                communications: person.communications.map((c) =>
-                  c.application === selectedApplication
-                    ? { ...c, metadata: { ...c.metadata, [key]: e.target.value } }
-                    : c,
-                ),
+              setCurrentMetadata({
+                ...currentMetadata,
+                [key]: e.target.value,
               });
             }}
           />
@@ -161,16 +158,13 @@ export default function EditPersonComponent() {
           <Field.Root>
             <Field.Label>Application</Field.Label>
             <NativeSelect.Root>
-              <NativeSelect.Field name="application" value={person.communications[0].application} onChange={(e) => {
-                setPerson({
-                  ...person,
-                  communications: person.communications.map((c) => c.application === e.target.value ? { ...c, application: e.target.value } : c),
-                });
+              <NativeSelect.Field name="application" value={currentApplication ?? undefined} onChange={(e) => {
+                setCurrentApplication(e.target.value as Application)
               }}>
-                <For each={['slack']}>
-                  {(item) => (
-                    <option key={item} value={item}>
-                      {item}
+                <For each={[undefined, 'slack']}>
+                  {(item, index) => (
+                    <option key={index} value={item}>
+                      {item ? firstLetterToUpperCase(item) : 'Aucune application'}
                     </option>
                   )}
                 </For>
@@ -179,16 +173,15 @@ export default function EditPersonComponent() {
             </NativeSelect.Root>
           </Field.Root>
 
-          <Field.Root>
-            <Fieldset.Content>
-              {person.communications.map((c) => (
-                <Field.Root key={c.application}>
-                  <Field.Label>{c.application}</Field.Label>
-                  {renderCommunicationMetadata(c, c.application)}
-                </Field.Root>
-              ))}
+          {currentApplication && (
+            <Field.Root>
+              <Field.Label>{firstLetterToUpperCase(currentApplication)}</Field.Label>
+              <Fieldset.Content>
+                {renderCommunicationMetadata(currentApplication, currentMetadata)}
             </Fieldset.Content>
           </Field.Root>
+          )}
+
         </Fieldset.Content>
 
         <Button
@@ -201,4 +194,8 @@ export default function EditPersonComponent() {
       </Fieldset.Root>
     </Container>
   );
+}
+
+function firstLetterToUpperCase(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
