@@ -39,7 +39,7 @@
     "@fontsource-variable/plus-jakarta-sans": "^5.2.5",
     "@react-router/node": "^7.6.0",
     "@ts-rest/core": "^3.52.1",
-    "birthday-bot-contracts": "^0.1.11",
+    "birthday-bot-contracts": "^0.1.14",
     "isbot": "^5.1.28",
     "next-themes": "^0.4.6",
     "react": "^19.1.0",
